@@ -10,24 +10,28 @@ export class CategoryService {
     constructor(@InjectRepository(Category)
     private categoryRepository: Repository<Category>,) { }
 
-    async createCategory(createCategoryDTO: CreateCategoryDTO): Promise<Category> {
-        let u = await this.categoryRepository.find({
+    async createCategory(createCategoryDTO: CreateCategoryDTO): Promise<Category | null> {
+        let u = await this.categoryRepository.findOne({
             where: { name: createCategoryDTO.name }
         })
 
         if (u)
             throw new ConflictException("Category already exists")
-        else
-            return await this.categoryRepository.create(createCategoryDTO)
+        else {
+         
+            u  = this.categoryRepository.create(createCategoryDTO)
+            return await this.categoryRepository.save(u);
+
+        }
     }
 
-    async getCategory():Promise<Category[]>{
+    async getCategory(): Promise<Category[]> {
         return await this.categoryRepository.find()
     }
 
-    async getCategoryById(id:number):Promise<Category | null>{
+    async getCategoryById(id: number): Promise<Category | null> {
         return await this.categoryRepository.findOne({
-            where:{id}
+            where: { id }
         })
     }
 

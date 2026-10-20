@@ -17,18 +17,22 @@ export class UserService {
         const user = await this.userRepository.findOne({
             where: { id },
         });
-        if(!user)
+        if (!user)
             throw new NotFoundException("User with the id not found ")
         return user
     }
+    async createUser(data: createUserDTO): Promise<User> {
+        const existingUser = await this.userRepository.findOne({
+            where: { email: data.email },
+        });
 
-    async createUser(createUserDTO:createUserDTO):Promise<User>{
-        
-        let u = await this.userRepository.findOne({where:{email:createUserDTO.email}})
-        if(u)
-            throw new ConflictException("User Already Exists");
-        else 
-            return await this.userRepository.create(createUserDTO);
+        if (existingUser) {
+            throw new ConflictException('User Already Exists');
+        }
+
+        const user = this.userRepository.create(data);
+
+        return await this.userRepository.save(user);
     }
 
 }
