@@ -6,10 +6,8 @@ export class createUserDTO {
     name: string;
 
     @IsString()
-    @IsEmail()
     email: string;
 
     @IsString()
-    @IsStrongPassword()
     password: string;
 }
