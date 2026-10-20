@@ -3,16 +3,12 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Copy dependency files
 COPY package*.json ./
 
-# Install dependencies
 RUN npm ci
 
-# Copy source code
 COPY . .
 
-# Build NestJS
 RUN npm run build
 
 
@@ -23,15 +19,15 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy dependency files
 COPY package*.json ./
 
-# Install only production dependencies
 RUN npm ci --omit=dev
 
-# Copy compiled application
+# Install PM2 globally
+RUN npm install pm2@latest -g
+
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 3000
 
-CMD ["node", "dist/main.js"]
+CMD ["pm2-runtime", "dist/main.js"]
